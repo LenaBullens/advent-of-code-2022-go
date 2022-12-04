@@ -20,6 +20,7 @@ func newAssignment(start int, end int) *assignment {
 }
 
 func main() {
+	part1()
 	part2()
 }
 

@@ -11,7 +11,6 @@ import (
 )
 
 func main() {
-
 	lines := helper.ReadLines("input-01.txt")
 	var elves []int
 
