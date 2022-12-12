@@ -68,6 +68,7 @@ func (pq *PriorityQueue) update(item *Item, value Point, priority int) {
 
 func main() {
 	solve1()
+	solve2()
 }
 
 func solve1() {
@@ -119,7 +120,7 @@ func solve1() {
 		for i := 0; i < len(unvisitedNeighbours); i++ {
 			row := unvisitedNeighbours[i].value.row
 			column := unvisitedNeighbours[i].value.column
-			if reachable(grid[nextNode.value.row][nextNode.value.column], grid[row][column]) {
+			if reachable1(grid[nextNode.value.row][nextNode.value.column], grid[row][column]) {
 				newDistance := tentativeDistances[nextNode] + 1
 				if newDistance < tentativeDistances[unvisitedNeighbours[i]] {
 					tentativeDistances[unvisitedNeighbours[i]] = newDistance
@@ -133,6 +134,68 @@ func solve1() {
 	endItem := tiles[*end]
 	result := tentativeDistances[endItem]
 	fmt.Printf("Result: %d\n", result)
+}
+
+func solve2() {
+	grid := convertToRuneGrid(helper.ReadGrid("input-12.txt"))
+
+	height := len(grid)
+	width := len(grid[0])
+
+	var start *Point
+
+	tentativeDistances := make(map[*Item]int, height*width)
+	priorityQueue := make(PriorityQueue, height*width)
+	tiles := make(map[Point]*Item, height*width)
+
+	i := 0
+	for r := 0; r < height; r++ {
+		for c := 0; c < width; c++ {
+			if grid[r][c] == 'E' {
+				p := createPoint(r, c)
+				item := Item{value: p, priority: 0, index: i, visited: false}
+				tentativeDistances[&item] = 0
+				priorityQueue[i] = &item
+				tiles[p] = &item
+				start = &p
+			} else {
+				p := createPoint(r, c)
+				item := Item{value: p, priority: MAXINT, index: i, visited: false}
+				tentativeDistances[&item] = MAXINT
+				priorityQueue[i] = &item
+				tiles[p] = &item
+			}
+			i = i + 1
+		}
+	}
+
+	if start == nil {
+		log.Fatal()
+	}
+
+	heap.Init(&priorityQueue)
+
+	for priorityQueue.Len() > 0 {
+		nextNode := heap.Pop(&priorityQueue).(*Item)
+		if grid[nextNode.value.row][nextNode.value.column] == 'a' || grid[nextNode.value.row][nextNode.value.column] == 'S' {
+			result := tentativeDistances[nextNode]
+			fmt.Printf("Result: %d\n", result)
+			break
+		}
+		unvisitedNeighbours := findUnvisitedNeighbours(nextNode, tiles, height, width)
+		for i := 0; i < len(unvisitedNeighbours); i++ {
+			row := unvisitedNeighbours[i].value.row
+			column := unvisitedNeighbours[i].value.column
+			if reachable2(grid[nextNode.value.row][nextNode.value.column], grid[row][column]) {
+				newDistance := tentativeDistances[nextNode] + 1
+				if newDistance < tentativeDistances[unvisitedNeighbours[i]] {
+					tentativeDistances[unvisitedNeighbours[i]] = newDistance
+					priorityQueue.update(unvisitedNeighbours[i], unvisitedNeighbours[i].value, newDistance)
+				}
+			}
+		}
+		nextNode.visited = true
+	}
 }
 
 func findUnvisitedNeighbours(item *Item, tiles map[Point]*Item, height int, width int) []*Item {
@@ -172,7 +235,7 @@ func findUnvisitedNeighbours(item *Item, tiles map[Point]*Item, height int, widt
 	return neighbours
 }
 
-func reachable(start rune, end rune) bool {
+func reachable1(start rune, end rune) bool {
 	if start == 'S' {
 		start = 'a'
 	}
@@ -180,6 +243,16 @@ func reachable(start rune, end rune) bool {
 		end = 'z'
 	}
 	return end-start <= 1
+}
+
+func reachable2(start rune, end rune) bool {
+	if start == 'E' {
+		start = 'z'
+	}
+	if end == 'S' {
+		end = 'a'
+	}
+	return end-start >= -1
 }
 
 func convertToRuneGrid(input [][]string) [][]rune {
