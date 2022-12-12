@@ -25,6 +25,7 @@ func createMonkey(id int, items []int, operationType string, operationAmount int
 }
 
 func main() {
+	solve1()
 	solve2()
 }
 
