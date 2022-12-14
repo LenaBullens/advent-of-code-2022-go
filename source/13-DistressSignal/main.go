@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	solve1()
+	solve2()
 }
 
 func solve1() {
@@ -48,7 +48,41 @@ func solve1() {
 }
 
 func solve2() {
+	lines := helper.ReadLines("input-13.txt")
 
+	var packets [][]any
+
+	i := 0
+	for i < len(lines) {
+		//Skip empty lines
+		for lines[i] == "" {
+			i++
+		}
+		packets = append(packets, parsePacket(lines[i]))
+		i++
+	}
+
+	twoPacket := parsePacket("[[2]]")
+	sixPacket := parsePacket("[[6]]")
+
+	indexTwo := 1
+	indexSix := 2 // [[2]] always before [[6]]
+
+	for j := 0; j < len(packets); j++ {
+		if compareLists(packets[j], twoPacket) == 1 {
+			indexTwo++
+		}
+	}
+
+	for j := 0; j < len(packets); j++ {
+		if compareLists(packets[j], sixPacket) == 1 {
+			indexSix++
+		}
+	}
+
+	result := indexTwo * indexSix
+
+	fmt.Println(result)
 }
 
 func parsePacket(input string) []any {
