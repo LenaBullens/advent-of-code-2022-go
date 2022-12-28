@@ -126,6 +126,7 @@ func (monkey Monkey) getRequiredValue() int {
 }
 
 func main() {
+	solve1()
 	solve2()
 }
 
