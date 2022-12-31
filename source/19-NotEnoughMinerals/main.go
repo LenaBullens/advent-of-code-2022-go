@@ -178,6 +178,7 @@ func (stack *Stack) Pop() (State, error) {
 }
 
 func main() {
+	solve1()
 	solve2()
 }
 
